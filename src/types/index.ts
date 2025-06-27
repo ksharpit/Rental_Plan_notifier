@@ -67,3 +67,19 @@ export interface Notification {
   read: boolean;
   createdAt: Date;
 }
+
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address?: string;
+  dateOfBirth?: Date;
+  createdAt: Date;
+}
+
+export interface CustomerSubscription extends Subscription {
+  customerName: string;
+  planName: string;
+  planPrice: number;
+}

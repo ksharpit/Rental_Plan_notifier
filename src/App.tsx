@@ -4,6 +4,7 @@ import { BottomNavigation } from './components/Layout/BottomNavigation';
 import { HomePage } from './pages/HomePage';
 import { MapPage } from './pages/MapPage';
 import { PlansPage } from './pages/PlansPage';
+import { CustomersPage } from './pages/CustomersPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -15,11 +16,13 @@ import {
   mockSubscriptions, 
   mockRentals 
 } from './data/mockData';
-import { BikeStation, Plan } from './types';
+import { BikeStation, Plan, Customer, CustomerSubscription } from './types';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [subscriptions] = useLocalStorage('subscriptions', mockSubscriptions);
+  const [customers, setCustomers] = useLocalStorage<Customer[]>('customers', []);
+  const [customerSubscriptions, setCustomerSubscriptions] = useLocalStorage<CustomerSubscription[]>('customerSubscriptions', []);
   const [user] = useLocalStorage('user', mockUser);
   const [stations] = useLocalStorage('stations', mockStations);
   const [plans] = useLocalStorage('plans', mockPlans);
@@ -49,11 +52,17 @@ function App() {
     // In a real app, this would open edit profile modal
   };
 
+  const handleAddCustomer = (customer: Customer, subscription: CustomerSubscription) => {
+    setCustomers(prev => [...prev, customer]);
+    setCustomerSubscriptions(prev => [...prev, subscription]);
+  };
+
   const getPageTitle = () => {
     switch (activeTab) {
       case 'home': return 'BikeShare';
       case 'map': return 'Find Bikes';
       case 'plans': return 'Plans';
+      case 'customers': return 'Customers';
       case 'notifications': return 'Notifications';
       case 'profile': return 'Profile';
       default: return 'BikeShare';
@@ -80,6 +89,15 @@ function App() {
             plans={plans}
             activeSubscription={activeSubscription}
             onSelectPlan={handlePlanSelect}
+          />
+        );
+      case 'customers':
+        return (
+          <CustomersPage
+            customers={customers}
+            subscriptions={customerSubscriptions}
+            plans={plans}
+            onAddCustomer={handleAddCustomer}
           />
         );
       case 'notifications':
