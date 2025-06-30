@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Calendar, Mail, Phone, MapPin, X } from 'lucide-react';
+import { User, Calendar, Mail, Phone, MapPin, X, IndianRupee } from 'lucide-react';
 import { Customer, Plan, CustomerSubscription } from '../../types';
 import { addDays } from 'date-fns';
 
@@ -9,6 +9,8 @@ interface AddCustomerFormProps {
   onClose: () => void;
 }
 
+const ONETIME_FEE = 500; // INR 500 onetime fee
+
 export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFormProps) {
   const [formData, setFormData] = useState({
     name: '',
@@ -17,7 +19,8 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
     address: '',
     dateOfBirth: '',
     selectedPlanId: '',
-    startDate: new Date().toISOString().split('T')[0]
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,6 +34,16 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
     if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
     if (!formData.selectedPlanId) newErrors.selectedPlanId = 'Please select a plan';
     if (!formData.startDate) newErrors.startDate = 'Start date is required';
+    if (!formData.endDate) newErrors.endDate = 'End date is required';
+    
+    // Validate that end date is after start date
+    if (formData.startDate && formData.endDate) {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(formData.endDate);
+      if (endDate <= startDate) {
+        newErrors.endDate = 'End date must be after start date';
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -43,7 +56,7 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
 
     const selectedPlan = plans.find(p => p.id === formData.selectedPlanId)!;
     const startDate = new Date(formData.startDate);
-    const endDate = addDays(startDate, selectedPlan.duration);
+    const endDate = new Date(formData.endDate);
 
     const customerId = `customer-${Date.now()}`;
     const subscriptionId = `sub-${Date.now()}`;
@@ -75,8 +88,39 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
   };
 
   const selectedPlan = plans.find(p => p.id === formData.selectedPlanId);
-  const startDate = formData.startDate ? new Date(formData.startDate) : new Date();
-  const endDate = selectedPlan ? addDays(startDate, selectedPlan.duration) : null;
+  const totalAmount = selectedPlan ? selectedPlan.price + ONETIME_FEE : ONETIME_FEE;
+
+  // Auto-suggest end date based on plan duration when plan is selected
+  const handlePlanChange = (planId: string) => {
+    setFormData(prev => {
+      const plan = plans.find(p => p.id === planId);
+      const suggestedEndDate = plan && prev.startDate 
+        ? addDays(new Date(prev.startDate), plan.duration).toISOString().split('T')[0]
+        : prev.endDate;
+      
+      return {
+        ...prev,
+        selectedPlanId: planId,
+        endDate: suggestedEndDate
+      };
+    });
+  };
+
+  // Update suggested end date when start date changes
+  const handleStartDateChange = (startDate: string) => {
+    setFormData(prev => {
+      const plan = selectedPlan;
+      const suggestedEndDate = plan && startDate
+        ? addDays(new Date(startDate), plan.duration).toISOString().split('T')[0]
+        : prev.endDate;
+      
+      return {
+        ...prev,
+        startDate,
+        endDate: prev.endDate || suggestedEndDate
+      };
+    });
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -208,19 +252,25 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
                       name="plan"
                       value={plan.id}
                       checked={formData.selectedPlanId === plan.id}
-                      onChange={(e) => setFormData({ ...formData, selectedPlanId: e.target.value })}
+                      onChange={(e) => handlePlanChange(e.target.value)}
                       className="sr-only"
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium text-gray-900">{plan.name}</h4>
-                        <span className="text-lg font-bold text-gray-900">
-                          ${plan.price}/{plan.type}
-                        </span>
+                        <div className="flex items-center text-lg font-bold text-gray-900">
+                          <IndianRupee size={16} />
+                          <span>{plan.price.toLocaleString()}</span>
+                        </div>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
                         {plan.duration} days • {plan.features.slice(0, 2).join(', ')}
                       </p>
+                      {plan.popular && (
+                        <span className="inline-block mt-1 px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">
+                          Most Popular
+                        </span>
+                      )}
                     </div>
                   </label>
                 ))}
@@ -228,32 +278,68 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
               {errors.selectedPlanId && <p className="text-sm text-error-600 mt-1">{errors.selectedPlanId}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date *
-              </label>
-              <input
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                min={new Date().toISOString().split('T')[0]}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.startDate ? 'border-error-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.startDate && <p className="text-sm text-error-600 mt-1">{errors.startDate}</p>}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date *
+                </label>
+                <input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => handleStartDateChange(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                    errors.startDate ? 'border-error-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.startDate && <p className="text-sm text-error-600 mt-1">{errors.startDate}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date *
+                </label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  min={formData.startDate || new Date().toISOString().split('T')[0]}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                    errors.endDate ? 'border-error-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.endDate && <p className="text-sm text-error-600 mt-1">{errors.endDate}</p>}
+              </div>
             </div>
 
-            {endDate && (
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-sm text-gray-600">
-                  <strong>Plan will expire on:</strong> {endDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
+            {selectedPlan && (
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                <h4 className="font-medium text-gray-900">Payment Summary</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{selectedPlan.name}</span>
+                    <div className="flex items-center">
+                      <IndianRupee size={14} />
+                      <span>{selectedPlan.price.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">One-time setup fee</span>
+                    <div className="flex items-center">
+                      <IndianRupee size={14} />
+                      <span>{ONETIME_FEE.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <div className="border-t border-gray-200 pt-1 mt-2">
+                    <div className="flex justify-between font-semibold">
+                      <span>Total Amount</span>
+                      <div className="flex items-center">
+                        <IndianRupee size={16} />
+                        <span>{totalAmount.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

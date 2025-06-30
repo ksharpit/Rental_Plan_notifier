@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Calendar, Phone, Mail, Clock } from 'lucide-react';
+import { User, Calendar, Phone, Mail, Clock, IndianRupee } from 'lucide-react';
 import { Customer, CustomerSubscription } from '../../types';
 import { format, differenceInDays } from 'date-fns';
 
@@ -74,7 +74,10 @@ export function CustomerList({ customers, subscriptions, onCustomerSelect }: Cus
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900">{subscription.planName}</span>
-                  <span className="text-sm font-medium text-gray-700">${subscription.planPrice}</span>
+                  <div className="flex items-center text-sm font-medium text-gray-700">
+                    <IndianRupee size={14} />
+                    <span>{subscription.planPrice.toLocaleString()}</span>
+                  </div>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Calendar size={14} className="mr-1" />

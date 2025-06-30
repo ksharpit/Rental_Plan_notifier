@@ -88,58 +88,31 @@ export const mockBikes: Bike[] = [
 export const mockPlans: Plan[] = [
   {
     id: 'weekly-basic',
-    name: 'Weekly Explorer',
+    name: 'Weekly Plan',
     type: 'weekly',
-    price: 25,
+    price: 1857,
     duration: 7,
     features: [
       'Unlimited 30-minute rides',
       'Access to all stations',
       'Standard bikes included',
-      'Mobile app support'
+      'Mobile app support',
+      '24/7 customer support'
     ]
-  },
-  {
-    id: 'weekly-premium',
-    name: 'Weekly Premium',
-    type: 'weekly',
-    price: 35,
-    duration: 7,
-    features: [
-      'Unlimited 45-minute rides',
-      'Access to all stations',
-      'Electric bikes included',
-      'Priority bike reservation',
-      'Mobile app support'
-    ],
-    popular: true
   },
   {
     id: 'monthly-basic',
-    name: 'Monthly Commuter',
+    name: 'Monthly Plan',
     type: 'monthly',
-    price: 80,
+    price: 7000,
     duration: 30,
     features: [
-      'Unlimited 30-minute rides',
+      'Unlimited 45-minute rides',
       'Access to all stations',
-      'Standard bikes included',
-      'Mobile app support',
-      '20% discount on extra time'
-    ]
-  },
-  {
-    id: 'monthly-premium',
-    name: 'Monthly Unlimited',
-    type: 'monthly',
-    price: 120,
-    duration: 30,
-    features: [
-      'Unlimited 60-minute rides',
-      'Access to all stations',
-      'Electric bikes included',
+      'Standard & electric bikes',
       'Priority bike reservation',
       'Mobile app support',
+      '24/7 customer support',
       'Free extra time up to 15 minutes'
     ],
     popular: true
@@ -150,7 +123,7 @@ export const mockSubscriptions: Subscription[] = [
   {
     id: 'sub-1',
     userId: '1',
-    planId: 'weekly-premium',
+    planId: 'weekly-basic',
     startDate: subDays(new Date(), 5),
     endDate: addDays(new Date(), 2),
     status: 'active',

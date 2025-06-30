@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Star } from 'lucide-react';
+import { Check, Star, IndianRupee } from 'lucide-react';
 import { Plan } from '../../types';
 
 interface PlanCardProps {
@@ -37,9 +37,10 @@ export function PlanCard({ plan, isActive = false, onSelect }: PlanCardProps) {
 
       <div className="text-center mb-6">
         <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-        <div className="text-3xl font-bold text-gray-900">
-          ${plan.price}
-          <span className="text-lg font-normal text-gray-600">/{plan.type}</span>
+        <div className="flex items-center justify-center text-3xl font-bold text-gray-900">
+          <IndianRupee size={24} />
+          <span>{plan.price.toLocaleString()}</span>
+          <span className="text-lg font-normal text-gray-600 ml-1">/{plan.type}</span>
         </div>
       </div>
 

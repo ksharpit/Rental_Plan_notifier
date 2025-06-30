@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock, AlertTriangle } from 'lucide-react';
+import { Calendar, Clock, AlertTriangle, IndianRupee } from 'lucide-react';
 import { Subscription, Plan } from '../../types';
 import { format, differenceInDays } from 'date-fns';
 
@@ -23,7 +23,10 @@ export function SubscriptionCard({ subscription, plan, onRenew }: SubscriptionCa
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
-          <p className="text-sm text-gray-600">${plan.price}/{plan.type}</p>
+          <div className="flex items-center text-sm text-gray-600">
+            <IndianRupee size={14} />
+            <span>{plan.price.toLocaleString()}/{plan.type}</span>
+          </div>
         </div>
         
         {(isExpiringSoon || isExpired) && (
