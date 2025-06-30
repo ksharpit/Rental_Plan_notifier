@@ -49,6 +49,27 @@ export const mockStations: BikeStation[] = [
     availableBikes: 3,
     totalBikes: 10,
     distance: 1.5
+  },
+  // New Electica Battery Swap Stations
+  {
+    id: '5',
+    name: 'Electica LIG Battery Swap',
+    address: 'LIG Colony, Indore, MP',
+    latitude: 22.7196,
+    longitude: 75.8577,
+    availableBikes: 6,
+    totalBikes: 8,
+    distance: 2.1
+  },
+  {
+    id: '6',
+    name: 'Electica Niranjanpur Battery Swap',
+    address: 'Niranjanpur, Indore, MP',
+    latitude: 22.7532,
+    longitude: 75.8937,
+    availableBikes: 4,
+    totalBikes: 6,
+    distance: 3.2
   }
 ];
 
@@ -93,7 +114,8 @@ export const mockPlans: Plan[] = [
     price: 1857,
     duration: 7,
     features: [
-      'Unlimited 30-minute rides',
+      'Unlimited minutes',
+      'Unlimited kilometers',
       'Access to all stations',
       'Standard bikes included',
       'Mobile app support',
@@ -107,13 +129,14 @@ export const mockPlans: Plan[] = [
     price: 7000,
     duration: 30,
     features: [
-      'Unlimited 45-minute rides',
+      'Unlimited minutes',
+      'Unlimited kilometers',
       'Access to all stations',
       'Standard & electric bikes',
       'Priority bike reservation',
       'Mobile app support',
       '24/7 customer support',
-      'Free extra time up to 15 minutes'
+      'Battery swap stations access'
     ],
     popular: true
   }

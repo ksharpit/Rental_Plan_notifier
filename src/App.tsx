@@ -31,7 +31,7 @@ function App() {
   const activeSubscription = subscriptions.find(sub => sub.status === 'active');
   const activePlan = activeSubscription ? plans.find(plan => plan.id === activeSubscription.planId) : undefined;
 
-  const { notifications, unreadCount, markAsRead, clearAll } = useNotifications(subscriptions);
+  const { notifications, unreadCount, markAsRead, clearAll } = useNotifications(customerSubscriptions);
 
   const handleStationSelect = (station: BikeStation) => {
     console.log('Selected station:', station);
@@ -59,11 +59,11 @@ function App() {
 
   const getPageTitle = () => {
     switch (activeTab) {
-      case 'home': return 'BikeShare';
-      case 'map': return 'Find Bikes';
+      case 'home': return 'Dashboard';
+      case 'map': return 'Battery Stations';
       case 'plans': return 'Plans';
       case 'customers': return 'Customers';
-      case 'notifications': return 'Notifications';
+      case 'notifications': return 'Alerts';
       case 'profile': return 'Profile';
       default: return 'BikeShare';
     }
@@ -74,11 +74,9 @@ function App() {
       case 'home':
         return (
           <HomePage
-            subscription={activeSubscription}
-            plan={activePlan}
-            stations={stations}
-            onStationSelect={handleStationSelect}
-            onRenewPlan={handleRenewPlan}
+            customers={customers}
+            subscriptions={customerSubscriptions}
+            plans={plans}
           />
         );
       case 'map':
@@ -103,7 +101,8 @@ function App() {
       case 'notifications':
         return (
           <NotificationsPage
-            notifications={notifications}
+            customers={customers}
+            subscriptions={customerSubscriptions}
             onMarkAsRead={markAsRead}
             onClearAll={clearAll}
           />

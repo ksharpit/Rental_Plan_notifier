@@ -16,7 +16,7 @@ export function PlansPage({ plans, activeSubscription, onSelectPlan }: PlansPage
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Plan</h2>
-        <p className="text-gray-600">Select the perfect plan for your riding needs</p>
+        <p className="text-gray-600">Select the perfect plan for unlimited bike rides</p>
       </div>
 
       <div>
@@ -50,9 +50,11 @@ export function PlansPage({ plans, activeSubscription, onSelectPlan }: PlansPage
       <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
         <h4 className="font-semibold text-primary-900 mb-2">Why Choose Our Plans?</h4>
         <ul className="text-sm text-primary-800 space-y-1">
+          <li>• Unlimited minutes and kilometers</li>
           <li>• No hidden fees or charges</li>
           <li>• Cancel anytime with no penalties</li>
           <li>• Access to premium electric bikes</li>
+          <li>• Battery swap stations included</li>
           <li>• 24/7 customer support</li>
           <li>• Mobile app with real-time tracking</li>
         </ul>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Calendar, Mail, Phone, MapPin, X, IndianRupee } from 'lucide-react';
+import { User, Calendar, Phone, MapPin, X, IndianRupee, Upload, FileText } from 'lucide-react';
 import { Customer, Plan, CustomerSubscription } from '../../types';
 import { addDays } from 'date-fns';
 
@@ -14,13 +14,14 @@ const ONETIME_FEE = 500; // INR 500 onetime fee
 export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFormProps) {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     phone: '',
     address: '',
-    dateOfBirth: '',
     selectedPlanId: '',
     startDate: new Date().toISOString().split('T')[0],
-    endDate: ''
+    endDate: '',
+    paymentProof: null as File | null,
+    paymentAmount: '',
+    paymentNotes: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -29,12 +30,11 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
     if (!formData.selectedPlanId) newErrors.selectedPlanId = 'Please select a plan';
     if (!formData.startDate) newErrors.startDate = 'Start date is required';
     if (!formData.endDate) newErrors.endDate = 'End date is required';
+    if (!formData.paymentAmount.trim()) newErrors.paymentAmount = 'Payment amount is required';
     
     // Validate that end date is after start date
     if (formData.startDate && formData.endDate) {
@@ -64,10 +64,9 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
     const customer: Customer = {
       id: customerId,
       name: formData.name,
-      email: formData.email,
+      email: `${formData.name.toLowerCase().replace(/\s+/g, '.')}@customer.com`, // Auto-generate email
       phone: formData.phone,
       address: formData.address || undefined,
-      dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined,
       createdAt: new Date()
     };
 
@@ -101,7 +100,8 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
       return {
         ...prev,
         selectedPlanId: planId,
-        endDate: suggestedEndDate
+        endDate: suggestedEndDate,
+        paymentAmount: plan ? totalAmount.toString() : ''
       };
     });
   };
@@ -120,6 +120,13 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
         endDate: prev.endDate || suggestedEndDate
       };
     });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, paymentProof: file }));
+    }
   };
 
   return (
@@ -161,25 +168,6 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address *
-              </label>
-              <div className="relative">
-                <Mail size={16} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                    errors.email ? 'border-error-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter email address"
-                />
-              </div>
-              {errors.email && <p className="text-sm text-error-600 mt-1">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Phone Number *
               </label>
               <div className="relative">
@@ -209,21 +197,6 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Enter address"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date of Birth (Optional)
-              </label>
-              <div className="relative">
-                <Calendar size={16} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
             </div>
@@ -264,7 +237,7 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
                         </div>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
-                        {plan.duration} days • {plan.features.slice(0, 2).join(', ')}
+                        {plan.duration} days • Unlimited minutes & kms
                       </p>
                       {plan.popular && (
                         <span className="inline-block mt-1 px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">
@@ -311,6 +284,70 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
                 {errors.endDate && <p className="text-sm text-error-600 mt-1">{errors.endDate}</p>}
               </div>
             </div>
+          </div>
+
+          {/* Payment Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Payment Information</h3>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Amount Paid *
+              </label>
+              <div className="relative">
+                <IndianRupee size={16} className="absolute left-3 top-3 text-gray-400" />
+                <input
+                  type="number"
+                  value={formData.paymentAmount}
+                  onChange={(e) => setFormData({ ...formData, paymentAmount: e.target.value })}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                    errors.paymentAmount ? 'border-error-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter amount paid"
+                />
+              </div>
+              {errors.paymentAmount && <p className="text-sm text-error-600 mt-1">{errors.paymentAmount}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Payment Proof (Optional)
+              </label>
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  accept="image/*,.pdf"
+                  className="hidden"
+                  id="payment-proof"
+                />
+                <label
+                  htmlFor="payment-proof"
+                  className="w-full flex items-center justify-center px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  <Upload size={16} className="mr-2 text-gray-400" />
+                  <span className="text-gray-600">
+                    {formData.paymentProof ? formData.paymentProof.name : 'Upload receipt/screenshot'}
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Payment Notes (Optional)
+              </label>
+              <div className="relative">
+                <FileText size={16} className="absolute left-3 top-3 text-gray-400" />
+                <textarea
+                  value={formData.paymentNotes}
+                  onChange={(e) => setFormData({ ...formData, paymentNotes: e.target.value })}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="Add payment notes (method, reference, etc.)"
+                  rows={2}
+                />
+              </div>
+            </div>
 
             {selectedPlan && (
               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
@@ -332,7 +369,7 @@ export function AddCustomerForm({ plans, onAddCustomer, onClose }: AddCustomerFo
                   </div>
                   <div className="border-t border-gray-200 pt-1 mt-2">
                     <div className="flex justify-between font-semibold">
-                      <span>Total Amount</span>
+                      <span>Total Expected</span>
                       <div className="flex items-center">
                         <IndianRupee size={16} />
                         <span>{totalAmount.toLocaleString()}</span>
