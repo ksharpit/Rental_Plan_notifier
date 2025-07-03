@@ -7,14 +7,25 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "android": "cap run android",
+    "android:build": "npm run build && cap sync && cap run android",
+    "capacitor:sync": "cap sync",
+    "capacitor:open": "cap open android"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.1",
     "lucide-react": "^0.294.0",
-    "date-fns": "^2.30.0"
+    "date-fns": "^2.30.0",
+    "@capacitor/core": "^5.5.1",
+    "@capacitor/android": "^5.5.1",
+    "@capacitor/app": "^5.0.6",
+    "@capacitor/haptics": "^5.0.6",
+    "@capacitor/keyboard": "^5.0.6",
+    "@capacitor/status-bar": "^5.0.6",
+    "@capacitor/splash-screen": "^5.0.6"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -29,6 +40,7 @@
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "@capacitor/cli": "^5.5.1"
   }
 }
