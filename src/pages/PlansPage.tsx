@@ -15,12 +15,20 @@ export function PlansPage({ plans, activeSubscription, onSelectPlan }: PlansPage
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Plan</h2>
-        <p className="text-gray-600">Select the perfect plan for unlimited bike rides</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Our Plans</h2>
+        <p className="text-gray-600 dark:text-gray-400">Affordable bike rental plans for everyone</p>
+      </div>
+
+      {/* Service Charge Notice */}
+      <div className="bg-primary-50 dark:bg-primary-900 rounded-xl p-4 border border-primary-200 dark:border-primary-700">
+        <h4 className="font-semibold text-primary-900 dark:text-primary-100 mb-2">One-time Setup Fee</h4>
+        <p className="text-sm text-primary-800 dark:text-primary-200">
+          ₹500 one-time service charge applies during customer onboarding for account setup and bike allocation.
+        </p>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Plans</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Weekly Plans</h3>
         <div className="grid gap-4">
           {weeklyPlans.map((plan) => (
             <PlanCard
@@ -28,13 +36,14 @@ export function PlansPage({ plans, activeSubscription, onSelectPlan }: PlansPage
               plan={plan}
               isActive={activeSubscription?.planId === plan.id}
               onSelect={onSelectPlan}
+              showSelectButton={false}
             />
           ))}
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Plans</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Monthly Plans</h3>
         <div className="grid gap-4">
           {monthlyPlans.map((plan) => (
             <PlanCard
@@ -42,14 +51,15 @@ export function PlansPage({ plans, activeSubscription, onSelectPlan }: PlansPage
               plan={plan}
               isActive={activeSubscription?.planId === plan.id}
               onSelect={onSelectPlan}
+              showSelectButton={false}
             />
           ))}
         </div>
       </div>
 
-      <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
-        <h4 className="font-semibold text-primary-900 mb-2">Why Choose Our Plans?</h4>
-        <ul className="text-sm text-primary-800 space-y-1">
+      <div className="bg-primary-50 dark:bg-primary-900 rounded-xl p-4 border border-primary-200 dark:border-primary-700">
+        <h4 className="font-semibold text-primary-900 dark:text-primary-100 mb-2">Why Choose Our Plans?</h4>
+        <ul className="text-sm text-primary-800 dark:text-primary-200 space-y-1">
           <li>• Unlimited minutes and kilometers</li>
           <li>• No hidden fees or charges</li>
           <li>• Cancel anytime with no penalties</li>

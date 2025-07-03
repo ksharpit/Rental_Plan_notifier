@@ -1,16 +1,16 @@
 import React from 'react';
-import { Home, Map, CreditCard, Bell, User, Users } from 'lucide-react';
+import { Home, CreditCard, Bell, User, Users } from 'lucide-react';
 
 interface BottomNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   notificationCount?: number;
+  darkMode?: boolean;
 }
 
-export function BottomNavigation({ activeTab, onTabChange, notificationCount = 0 }: BottomNavigationProps) {
+export function BottomNavigation({ activeTab, onTabChange, notificationCount = 0, darkMode = false }: BottomNavigationProps) {
   const tabs = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'map', label: 'Map', icon: Map },
     { id: 'plans', label: 'Plans', icon: CreditCard },
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'notifications', label: 'Alerts', icon: Bell, badge: notificationCount },
@@ -18,7 +18,9 @@ export function BottomNavigation({ activeTab, onTabChange, notificationCount = 0
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-2 safe-area-bottom">
+    <div className={`fixed bottom-0 left-0 right-0 border-t px-2 py-2 safe-area-bottom ${
+      darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+    }`}>
       <div className="flex justify-around items-center max-w-md mx-auto">
         {tabs.map(({ id, label, icon: Icon, badge }) => (
           <button
@@ -27,6 +29,8 @@ export function BottomNavigation({ activeTab, onTabChange, notificationCount = 0
             className={`flex flex-col items-center py-2 px-2 rounded-lg transition-colors relative ${
               activeTab === id
                 ? 'text-primary-600 bg-primary-50'
+                : darkMode 
+                ? 'text-gray-400 hover:text-gray-200'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >

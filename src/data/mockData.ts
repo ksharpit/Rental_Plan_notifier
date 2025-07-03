@@ -3,54 +3,13 @@ import { addDays, subDays } from 'date-fns';
 
 export const mockUser: User = {
   id: '1',
-  name: 'Alex Johnson',
-  email: 'alex.johnson@email.com',
-  phone: '+1 (555) 123-4567',
+  name: 'Provider Admin',
+  email: 'provider@electica.com',
+  phone: '+91 98765 43210',
   avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2'
 };
 
 export const mockStations: BikeStation[] = [
-  {
-    id: '1',
-    name: 'Central Park Station',
-    address: '123 Park Ave, New York, NY',
-    latitude: 40.7829,
-    longitude: -73.9654,
-    availableBikes: 8,
-    totalBikes: 12,
-    distance: 0.2
-  },
-  {
-    id: '2',
-    name: 'Times Square Hub',
-    address: '456 Broadway, New York, NY',
-    latitude: 40.7580,
-    longitude: -73.9855,
-    availableBikes: 5,
-    totalBikes: 15,
-    distance: 0.8
-  },
-  {
-    id: '3',
-    name: 'Brooklyn Bridge Point',
-    address: '789 Bridge St, Brooklyn, NY',
-    latitude: 40.7061,
-    longitude: -73.9969,
-    availableBikes: 12,
-    totalBikes: 18,
-    distance: 1.2
-  },
-  {
-    id: '4',
-    name: 'University Campus',
-    address: '321 College Ave, New York, NY',
-    latitude: 40.7505,
-    longitude: -73.9934,
-    availableBikes: 3,
-    totalBikes: 10,
-    distance: 1.5
-  },
-  // New Electica Battery Swap Stations
   {
     id: '5',
     name: 'Electica LIG Battery Swap',
@@ -78,7 +37,7 @@ export const mockBikes: Bike[] = [
     id: '1',
     model: 'Urban Cruiser',
     type: 'standard',
-    stationId: '1',
+    stationId: '5',
     isAvailable: true
   },
   {
@@ -86,14 +45,14 @@ export const mockBikes: Bike[] = [
     model: 'E-Bike Pro',
     type: 'electric',
     batteryLevel: 85,
-    stationId: '1',
+    stationId: '5',
     isAvailable: true
   },
   {
     id: '3',
     model: 'City Rider',
     type: 'standard',
-    stationId: '2',
+    stationId: '6',
     isAvailable: true
   },
   {
@@ -101,7 +60,7 @@ export const mockBikes: Bike[] = [
     model: 'Thunder Bolt',
     type: 'electric',
     batteryLevel: 92,
-    stationId: '3',
+    stationId: '6',
     isAvailable: false
   }
 ];
@@ -161,8 +120,8 @@ export const mockRentals: Rental[] = [
     bikeId: '2',
     startTime: subDays(new Date(), 2),
     endTime: subDays(new Date(), 2),
-    startStation: 'Central Park Station',
-    endStation: 'Times Square Hub',
+    startStation: 'Electica LIG Battery Swap',
+    endStation: 'Electica Niranjanpur Battery Swap',
     cost: 0,
     status: 'completed'
   },
@@ -172,8 +131,8 @@ export const mockRentals: Rental[] = [
     bikeId: '1',
     startTime: subDays(new Date(), 1),
     endTime: subDays(new Date(), 1),
-    startStation: 'Times Square Hub',
-    endStation: 'Brooklyn Bridge Point',
+    startStation: 'Electica Niranjanpur Battery Swap',
+    endStation: 'Electica LIG Battery Swap',
     cost: 0,
     status: 'completed'
   }

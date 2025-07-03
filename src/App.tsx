@@ -2,40 +2,47 @@ import React, { useState } from 'react';
 import { Header } from './components/Layout/Header';
 import { BottomNavigation } from './components/Layout/BottomNavigation';
 import { HomePage } from './pages/HomePage';
-import { MapPage } from './pages/MapPage';
 import { PlansPage } from './pages/PlansPage';
 import { CustomersPage } from './pages/CustomersPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { LoginPage } from './pages/LoginPage';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useNotifications } from './hooks/useNotifications';
 import { 
   mockUser, 
-  mockStations, 
   mockPlans, 
   mockSubscriptions, 
   mockRentals 
 } from './data/mockData';
-import { BikeStation, Plan, Customer, CustomerSubscription } from './types';
+import { Plan, Customer, CustomerSubscription } from './types';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [subscriptions] = useLocalStorage('subscriptions', mockSubscriptions);
   const [customers, setCustomers] = useLocalStorage<Customer[]>('customers', []);
   const [customerSubscriptions, setCustomerSubscriptions] = useLocalStorage<CustomerSubscription[]>('customerSubscriptions', []);
-  const [user] = useLocalStorage('user', mockUser);
-  const [stations] = useLocalStorage('stations', mockStations);
+  const [user, setUser] = useLocalStorage('user', mockUser);
   const [plans] = useLocalStorage('plans', mockPlans);
   const [rentals] = useLocalStorage('rentals', mockRentals);
+  const [isLoggedIn, setIsLoggedIn] = useLocalStorage('isLoggedIn', false);
+  const [darkMode, setDarkMode] = useLocalStorage('darkMode', false);
 
   const activeSubscription = subscriptions.find(sub => sub.status === 'active');
-  const activePlan = activeSubscription ? plans.find(plan => plan.id === activeSubscription.planId) : undefined;
 
   const { notifications, unreadCount, markAsRead, clearAll } = useNotifications(customerSubscriptions);
 
-  const handleStationSelect = (station: BikeStation) => {
-    console.log('Selected station:', station);
-    // In a real app, this would navigate to station details or bike selection
+  const handleLogin = (username: string, password: string) => {
+    if (username === 'provider123' && password === 'Electica123') {
+      setIsLoggedIn(true);
+      return true;
+    }
+    return false;
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setActiveTab('home');
   };
 
   const handlePlanSelect = (plan: Plan) => {
@@ -43,24 +50,18 @@ function App() {
     // In a real app, this would navigate to payment flow
   };
 
-  const handleRenewPlan = () => {
-    setActiveTab('plans');
-  };
-
-  const handleEditProfile = () => {
-    console.log('Edit profile');
-    // In a real app, this would open edit profile modal
-  };
-
   const handleAddCustomer = (customer: Customer, subscription: CustomerSubscription) => {
     setCustomers(prev => [...prev, customer]);
     setCustomerSubscriptions(prev => [...prev, subscription]);
   };
 
+  const handleUpdateProfile = (updatedUser: any) => {
+    setUser(updatedUser);
+  };
+
   const getPageTitle = () => {
     switch (activeTab) {
       case 'home': return 'Dashboard';
-      case 'map': return 'Battery Stations';
       case 'plans': return 'Plans';
       case 'customers': return 'Customers';
       case 'notifications': return 'Alerts';
@@ -79,8 +80,6 @@ function App() {
             plans={plans}
           />
         );
-      case 'map':
-        return <MapPage stations={stations} />;
       case 'plans':
         return (
           <PlansPage
@@ -111,8 +110,10 @@ function App() {
         return (
           <ProfilePage
             user={user}
-            rentals={rentals}
-            onEditProfile={handleEditProfile}
+            onLogout={handleLogout}
+            onUpdateProfile={handleUpdateProfile}
+            darkMode={darkMode}
+            onToggleDarkMode={setDarkMode}
           />
         );
       default:
@@ -120,13 +121,18 @@ function App() {
     }
   };
 
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={handleLogin} darkMode={darkMode} />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
       <Header
         title={getPageTitle()}
         showNotifications={activeTab !== 'notifications'}
         notificationCount={unreadCount}
         onNotificationClick={() => setActiveTab('notifications')}
+        darkMode={darkMode}
       />
       
       <main className="px-4 py-6 pb-24 max-w-md mx-auto">
@@ -137,6 +143,7 @@ function App() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         notificationCount={unreadCount}
+        darkMode={darkMode}
       />
     </div>
   );
