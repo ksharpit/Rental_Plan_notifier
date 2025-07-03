@@ -5,7 +5,29 @@ ext {
     cdvVersionCode = 1
     cdvVersionCodeTime = 1
     cdvBuildToolsVersion = "34.0.0"
+    
+    // AndroidX versions
     cdvAndroidXAppCompatVersion = "1.6.1"
     cdvAndroidXCoreVersion = "1.12.0"
     cdvAndroidXWebKitVersion = "1.9.0"
+    cdvAndroidXActivityVersion = "1.8.2"
+    cdvAndroidXFragmentVersion = "1.6.2"
+    cdvAndroidXCoordinatorLayoutVersion = "1.2.0"
+    
+    // Support library versions (for backward compatibility)
+    cdvSupportV4Version = "28.0.0"
+    cdvSupportV13Version = "28.0.0"
+    
+    // Google Play Services versions
+    cdvPlayServicesVersion = "+"
+    cdvPlayServicesLocationVersion = "+"
+    cdvPlayServicesMapsVersion = "+"
+    
+    // Firebase versions
+    cdvFirebaseVersion = "+"
+    cdvFirebaseMessagingVersion = "+"
+    
+    // Other common plugin variables
+    cdvOkHttpVersion = "3.14.9"
+    cdvGsonVersion = "2.8.9"
 }
