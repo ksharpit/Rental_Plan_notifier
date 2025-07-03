@@ -1,0 +1,11 @@
+ext {
+    cdvMinSdkVersion = 22
+    cdvCompileSdkVersion = 34
+    cdvTargetSdkVersion = 34
+    cdvVersionCode = 1
+    cdvVersionCodeTime = 1
+    cdvBuildToolsVersion = "34.0.0"
+    cdvAndroidXAppCompatVersion = "1.6.1"
+    cdvAndroidXCoreVersion = "1.12.0"
+    cdvAndroidXWebKitVersion = "1.9.0"
+}

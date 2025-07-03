@@ -1,0 +1,89 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace "capacitor.cordova.android.plugins"
+    compileSdkVersion project.hasProperty('cdvCompileSdkVersion') ? cdvCompileSdkVersion : 34
+    
+    defaultConfig {
+        minSdkVersion project.hasProperty('cdvMinSdkVersion') ? cdvMinSdkVersion : 22
+        targetSdkVersion project.hasProperty('cdvTargetSdkVersion') ? cdvTargetSdkVersion : 34
+        versionCode project.hasProperty('cdvVersionCode') ? cdvVersionCode : 1
+        versionName project.hasProperty('cdvVersionName') ? cdvVersionName : "1.0.0"
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation fileTree(dir: 'src/main/libs', include: ['*.jar'])
+    implementation "androidx.appcompat:appcompat:$cdvAndroidXAppCompatVersion"
+    implementation "androidx.core:core:$cdvAndroidXCoreVersion"
+    implementation "androidx.webkit:webkit:$cdvAndroidXWebKitVersion"
+    //SUB-PROJECT DEPENDENCIES START
+    //SUB-PROJECT DEPENDENCIES END
+}
+
+//SUB-PROJECT CORDOVA REQUIREMENTS START
+//SUB-PROJECT CORDOVA REQUIREMENTS END
+
+def promptForReleaseKeyPassword() {
+    if (! project.hasProperty('cdvReleaseSigningPropertiesFile')) {
+        return;
+    }
+    if (! project.hasProperty('cdvPrintBuildInfo')) {
+        return;
+    }
+
+    def propertiesFile = file(cdvReleaseSigningPropertiesFile)
+    def Properties versionProps = new Properties()
+
+    if (propertiesFile.exists()) {
+        versionProps.load(new FileInputStream(propertiesFile))
+    }
+
+    def val = versionProps['password']
+    if (! val) {
+        val = versionProps['storePassword']
+    }
+
+    if (! val) {
+        def promptText = 'Please enter the password for the release keystore:'
+
+        if (System.console()) {
+            val = System.console().readPassword(promptText)
+            val = new String(val)
+        } else {
+            print promptText
+            val = System.in.newReader().readLine()
+        }
+    }
+
+    versionProps['password'] = val
+    versionProps['storePassword'] = val
+    propertiesFile.withWriter { versionProps.store(it, null) }
+}
+
+tasks.whenTaskAdded { theTask ->
+    if (theTask.name == "packageRelease") {
+        theTask.dependsOn "promptForReleaseKeyPassword"
+    }
+}
+
+task promptForReleaseKeyPassword {
+    doLast {
+        promptForReleaseKeyPassword()
+    }
+}
